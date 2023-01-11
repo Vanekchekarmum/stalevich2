@@ -1,3 +1,4 @@
+import { AsyncStorage } from 'react-native';
 import { hydrate } from "../utils/stores";
 import { action, observable } from "mobx";
 import { persist } from "mobx-persist";
@@ -21,6 +22,10 @@ import {
   clearCart,
   payForOrder,
   addTable,
+  getProduct as getProductDetails,
+  orderInfo,
+  orderHistoryApi,
+  getCategory,
 } from "../api/api";
 import { getNumberValue, logError } from "../utils/handlers";
 import {
@@ -52,6 +57,7 @@ export interface IDataStore {
   products: Product[];
   sortedProducts: Product[];
   product: Product;
+  
   getListShop: (name: string) => Promise<void>;
   getShop: (uuidShop: string) => Promise<void>;
   getListProducts: (uuid?: string) => Promise<void>;
@@ -80,16 +86,27 @@ export interface IDataStore {
   setHouseNumber: (id: string) => void;
   setStreetId: (id: string) => void;
   setOrganizationId: (id: string) => void;
+  getShopDetailss: () => Promise<any>;
   placeTableOrder: () => Promise<void>;
   clearCart: () => void;
   setCart: (cart: CartData) => void;
   removeCart: () => void;
   setCountP: (count: number) => void;
-  sbpPay:(  orderId: string,
+  setOrderId: (id: string) => void;
+  getOrdersHistory: () => Promise<void>;
+  getOrderId: () => string;
+  getOrderInfo: () => Promise<void>;
+  getAllCategories: () => Promise<void>;
+  getHuy: () => void;
+  sbpPay: (
+    orderId: string,
     paymentGateway: string,
     orderNumber: string,
-    orderSum: any) => Promise<void>;
-    getLol: () => void;
+    orderSum: any
+  ) => Promise<void>;
+  getLol: () => void;
+  lolHuy: () => void;
+  getSessions: () => string;
 }
 
 class DataStore implements IDataStore {
@@ -110,10 +127,13 @@ class DataStore implements IDataStore {
   @observable cartUpated: boolean = false;
   @observable cartUpating: boolean = false;
   @observable table: string = null;
+  @observable orderId: string = null;
   @observable streetGuid: string = null;
   @observable houseNumber: string = null;
   @observable organizationId: string = null;
   @observable countP: number = 0;
+  @observable history: any = [];
+  @observable categories: any = [];
 
   @action.bound
   public setType(type: string): void {
@@ -128,6 +148,10 @@ class DataStore implements IDataStore {
   @action.bound
   public clearCart(): void {
     this.cart = null;
+  }
+  @action.bound
+  public getSessions(): string {
+    return this.session.sessionId;
   }
 
   @action.bound
@@ -152,6 +176,18 @@ class DataStore implements IDataStore {
       newFavoriteShops.add(shop.uuid);
     }
     this.favoriteShops = [...newFavoriteShops];
+  }
+  @action.bound
+  public setOrderId(orderId: string): void {
+    this.orderId = orderId;
+  }
+  @action.bound
+  public getOrderId(): string {
+    return this.orderId;
+  }
+  @action.bound
+  public lolHuy(): void {
+    this.session.sessionId = '';
   }
 
   @action.bound
@@ -195,17 +231,32 @@ class DataStore implements IDataStore {
         this.shop = response.data.data;
       }
     } catch (e) {
-      logError("getShop", e);
+      logError("getShop1", e);
     } finally {
       this.loading = false;
     }
   }
 
+  public async getShopDetailss(uuidShop: string): Promise<any> {
+    console.log("its starts 2");
+
+    const response = await getShopDetails(uuidShop);
+
+    // console.log("popppp", response.data.data);
+    return response.data.data;
+  }
   @action.bound
-  public async getListProducts(uuid?: string): Promise<void> {
+  public async getAllCategories(): Promise<any> {
+    const response = await getCategory();
+    this.categories = response.data
+    return this.categories;
+  } 
+
+  @action.bound
+  public async getListProducts(uuid?: string, categoryUuid?: string): Promise<void> {
     try {
       this.loading = true;
-      const response = await getListProducts(uuid || this.shop?.uuid);
+      const response = await getListProducts(uuid || this.shop?.uuid, categoryUuid || null);
       if (response && response?.data && response?.data?.data) {
         logError("getListProducts", uuid, response?.data?.data);
         this.products = response.data.data;
@@ -220,6 +271,12 @@ class DataStore implements IDataStore {
   @action.bound
   public getOrganizationId(): string {
     return this.organizationId;
+  }
+
+  @action.bound
+  public async getOrdersHistory(phone: string): Promise<any> {
+    const response = await orderHistoryApi(phone);
+    return response.data.data;
   }
 
   @action.bound
@@ -303,9 +360,9 @@ class DataStore implements IDataStore {
   public async getProduct(uuidProduct: string): Promise<void> {
     try {
       this.loading = true;
-      const response = await getProduct(uuidProduct);
-      if (response && response?.data && response?.data?.data) {
-        this.products = response.data.data;
+      const response = await getProductDetails(uuidProduct);
+      if (response ) {
+        return response.data.data;
       }
     } catch (e) {
       logError("getProduct", e);
@@ -340,9 +397,10 @@ class DataStore implements IDataStore {
     createSession()
       .then((response) => {
         this.session = response.data;
+        AsyncStorage.setItem("sessionId", this.session.sessionId);
       })
       .catch((e) => {
-        logError("generateSession", e);
+        logError("generateSessions", e);
       });
   }
 
@@ -351,6 +409,9 @@ class DataStore implements IDataStore {
     this.cartUpated = false;
     this.cartUpating = true;
     console.log("this.session.sessionId", this.session.sessionId);
+    console.log("this.currentCity?.uuid", this.shop?.uuid);
+    console.log("productId", productId);
+    console.log("productCount", productCount);
     addToCart(this.session.sessionId, this.shop.uuid, productId, productCount)
       .then((response) => {
         this.cartUpated = true;
@@ -377,6 +438,12 @@ class DataStore implements IDataStore {
     );
   }
   @action.bound
+  public async getHuy(): Promise<any> {
+    
+    return this.shop;
+  }
+
+  @action.bound
   public getStreetName(name: string): Promise<any> {
     console.log("this.currentCity?.uuid", this.currentCity?.uuid);
 
@@ -389,7 +456,6 @@ class DataStore implements IDataStore {
     houseNumber: string,
     pickup: number
   ): Promise<any> {
-    console.log("pickup", "-0-00--0-", pickup);
 
     return addressTransfer(
       this.session.sessionId,
@@ -417,6 +483,11 @@ class DataStore implements IDataStore {
   };
 
   @action.bound
+  public getOrderInfo = (): Promise<any> => {
+    return orderInfo("57e64971-7483-11ed-850b-0050569df549");
+  };
+
+  @action.bound
   public getLol = () => {
     return this.shop?.paymentGateway;
   };
@@ -434,6 +505,8 @@ class DataStore implements IDataStore {
   public orderAudit(data: any): Promise<any> {
     return auditOrder(this.session.sessionId, this.currentCity.uuid, data);
   }
+
+
 
   @action.bound
   public periodTime(date: any, organizationId: string): Promise<any> {

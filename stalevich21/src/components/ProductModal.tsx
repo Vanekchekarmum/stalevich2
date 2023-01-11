@@ -132,7 +132,7 @@ const ProductModal: React.FC<{
               <Text style={styles.weight}>{`${product?.weight}г`}</Text>
             )}
           </View>
-          {product?.specifications.map((item: Specification) => (
+          {/* {product?.specifications.map((item: Specification) => (
             <>
               <Text style={styles.fontProperty}>{item}</Text>
               {['Сливочный соус', 'Томатный соус'].map(item2 => (
@@ -150,7 +150,7 @@ const ProductModal: React.FC<{
                 </TouchableOpacity>
               ))}
             </>
-          ))}
+          ))} */}
         </ScrollView>
         {true && (
           <View style={styles.bottomBarWrapper}>

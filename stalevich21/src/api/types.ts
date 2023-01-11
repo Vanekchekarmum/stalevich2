@@ -15,6 +15,7 @@ export type UserParams = {
 export type SmsParams = {
   sessionId: string;
   phone: string;
+  getSession: number;
   //addressIp: string;
 };
 

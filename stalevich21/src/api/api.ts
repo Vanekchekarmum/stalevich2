@@ -16,7 +16,7 @@ import {
 // axios.defaults.headers.common['Authorization'] = authStore.token;
 
 const api = axios.create({
-  baseURL: "http://marketa.su/api/",
+  baseURL: "https://marketa.su/api/",
   headers: {
     Accept: "application/json, */*",
     "Cache-Control": "no-cache",
@@ -27,7 +27,7 @@ const api = axios.create({
   },
 });
 
-export const registration = (user: User) => api.post("user-create", user);
+export const registration = (user: any) => api.post("user-create", user);
 
 export const authorization = (params: UserParams) =>
   api.post("user-auth", params);
@@ -48,9 +48,12 @@ export const getListShop = (params: GetShopsParams) =>
 export const getShop = (uuid: string) =>
   api.post<{ data: Shop }>("organization-by-uuid", { uuid: uuid });
 
-export const getListProducts = (organizationUuid: string) =>
+export const getListProducts = (organizationUuid: string,categoryUuid:string | null) =>
   api.post<{ data: Product[] }>("products-by-organization", {
     organizationUuid: organizationUuid,
+    categoryUuid: categoryUuid || null, 
+
+    
   });
 
 export const searchProducts = (organizationUuid: string, searchValue: string) =>
@@ -60,8 +63,14 @@ export const searchProducts = (organizationUuid: string, searchValue: string) =>
   });
 
 export const getProduct = (productUuid: string) =>
-  api.post<{ data: Product }>("/product-by-uuid", {
+  api.post<{ data: any }>("/product-by-uuid", {
     uuid: productUuid,
+
+  });
+export const getCategory = () =>
+  api.post<{ data: any }>("/categories-by-organization", {
+    organizationUuid : "a7898941-95f4-11eb-850a-0050569dbef0" ,
+
   });
 
 export const createSession = () => api.post<{ data: Session }>("session");
@@ -70,14 +79,15 @@ export const addToCart = (
   sessionId: string,
   organizationId: string,
   productId: string,
-  productCount: number
+  productCount: number,
+  additions : [any]
 ) =>
   api.post<{ data: AddToCart }>("add-to-cart", {
     sessionId: sessionId,
     organizationId: organizationId,
     productId: productId,
     productCount: productCount,
-    additions: [],
+    additions: additions,
   });
 export const clearCart = (sessionId: string, organizations: string[]) =>
   api.post("cart-clear", {
@@ -145,6 +155,8 @@ export const auditOrder = (sessionId: string, cityId: string, data: any) =>
     cityId: cityId,
     ...data,
   });
+export const orderInfo = (orderId: string) =>
+  api.post("order-info", { orderId: orderId });
 
 export const periodTimeApi = (
   sessionId: string,
@@ -166,6 +178,11 @@ export const periodTimeApi = (
     date: date,
   });
 };
+
+export const orderHistoryApi = (phone:string) =>
+  api.post("orders-history", {
+    phone: phone,
+  });
 
 export const orderDateTimeApi = (
   sessionId: string,

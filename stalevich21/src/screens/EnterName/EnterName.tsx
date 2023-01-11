@@ -1,7 +1,7 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-
+import AuthStore from '../../stores/AuthStore';
 import ButtonBack from '../../components/ButtonBack';
 import InputWithLabel from '../../components/InputWithLabel';
 import ButtonRed from '../../components/ButtonRed';
@@ -13,6 +13,15 @@ import {PROFILE} from '../../utils/navigation';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 
 const EnterName = ({navigation}) => {
+  const {setUserName} = AuthStore;
+  const [name, setName] = useState('');
+
+  const onChange = (text:any) => {
+    setName(text);
+  };
+
+
+
   return (
     <KeyboardAwareScrollView
       showsVerticalScrollIndicator={false}
@@ -22,16 +31,20 @@ const EnterName = ({navigation}) => {
         <View style={wrappers.centeredWrapper}>
           <Text style={styles.fontProfile}>{'Как вас зовут?'}</Text>
           <InputWithLabel
+          value={name}
             style={{marginTop: 24, width: '100%'}}
             defaultValue={'Джон'}
+            onChange={onChange}
           />
         </View>
       </View>
       <ButtonRed
         style={{marginTop: WINDOW_HEIGHT - 360 - getBottomSpace()}}
         label={'Продолжить'}
-        //onPress={() => navigation.navigate(PROFILE)}
-        onPress={() => {}}
+        onPress={() =>{
+          setUserName(name);
+          navigation.navigate(PROFILE)}}
+        // onPress={() => {}}
       />
     </KeyboardAwareScrollView>
   );

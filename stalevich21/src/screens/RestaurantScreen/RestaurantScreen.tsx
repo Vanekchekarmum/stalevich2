@@ -39,6 +39,7 @@ import {
   wrappers,
 } from '../../utils/style';
 import {urlShops} from '../../utils/utils';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const HEADER_HEIGHT = 142;
 
@@ -203,7 +204,11 @@ const RestaurantScreen: React.FC<{
       }
     };
 
-    const onPressDish = (product: Product) => {
+    const onPressDish = (product: any) => {
+      if(product == null){
+        return;
+      }
+
       setCurrentProduct(product);
       setShowProductDetails(true);
     };
@@ -231,7 +236,7 @@ const RestaurantScreen: React.FC<{
           onPress={() => onPressDish(item?.item)}
           onPressAdd={number => {
             pushToCart(item.item.uuid, number);
-            console.log('number', cart);
+            console.log('number', cart, item.item);
           }}
         />
       );
@@ -256,6 +261,7 @@ const RestaurantScreen: React.FC<{
             style={{marginTop: 24}}
           />
           <View style={{height: 10}} />
+  
           <FlatList
             showsVerticalScrollIndicator={false}
             refreshControl={

@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import {inject, observer} from 'mobx-react';
-import OtpInputs from 'rn-custom-otp';
+import React, { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { inject, observer } from "mobx-react";
+import OtpInputs from "rn-custom-otp";
 
-import ButtonBack from '../../components/ButtonBack';
-import ButtonRed from '../../components/ButtonRed';
+import ButtonBack from "../../components/ButtonBack";
+import ButtonRed from "../../components/ButtonRed";
 
 import {
   BLACK,
@@ -12,11 +12,11 @@ import {
   LIGHT_GRAY,
   LIGHT_GRAY_2,
   WHITE,
-} from '../../assets/colors';
-import {fonts} from '../../constants/styles';
-import {formatPhoneNumber, wrappers} from '../../utils/style';
-import {ENTERNAME, PHONE} from '../../utils/navigation';
-import {IAuthStore} from '../../stores/AuthStore';
+} from "../../assets/colors";
+import { fonts } from "../../constants/styles";
+import { formatPhoneNumber, wrappers } from "../../utils/style";
+import { ENTERNAME, PHONE, PROFILE } from "../../utils/navigation";
+import { IAuthStore } from "../../stores/AuthStore";
 import { logError } from "../../utils/handlers";
 
 let seconds1 = 60;
@@ -24,12 +24,12 @@ let seconds1 = 60;
 const EnterCodeScreen: React.FC<{
   navigation: any;
   authStore?: IAuthStore;
-}> = inject('authStore')(
-  observer(({navigation, authStore, route}) => {
+}> = inject("authStore")(
+  observer(({ navigation, authStore, route }) => {
     let [seconds, setSeconds] = useState(60);
-    const {user, validCode, registration, auth} = authStore;
+    const { user, validCode, registration, auth } = authStore;
 
-    logError('EnterCodeScreen ', route?.params?.from)
+    logError("EnterCodeScreen ", route?.params?.from);
 
     const getNumber = (number: number) => {
       if (number < 10) {
@@ -42,49 +42,54 @@ const EnterCodeScreen: React.FC<{
     useEffect(() => {
       const timer = setInterval(
         () => setSeconds(seconds1 - 1 > 0 ? seconds1-- : 0),
-        1000,
+        1000
       );
       return () => clearInterval(timer);
     }, []);
 
     const changeCode = (number: number) => {
       if (number.toString().length > 3) {
-        validCode(Number(number), () => navigation.navigate(ENTERNAME));
+        if (route?.params?.empty) {
+          validCode(Number(number), () => navigation.navigate(PROFILE),route?.params?.phone,route?.params?.name, true);
+        } else {
+          validCode(Number(number), () => navigation.navigate(ENTERNAME), route?.params?.phone);
+        }
       }
     };
+    // TODO remove
 
     return (
       <ScrollView style={styles.wrapper}>
         <ButtonBack onPress={() => navigation.goBack()} />
         <View style={wrappers.centeredWrapper}>
-          <Text style={styles.fontProfile}>{'Теперь введите код'}</Text>
-          <View style={[wrappers.rowAlignedWrapper, {marginTop: 12}]}>
-            <Text style={[fonts.font16semibold, {color: GRAY}]}>
-              {'На номер '}
+          <Text style={styles.fontProfile}>{"Теперь введите код"}</Text>
+          <View style={[wrappers.rowAlignedWrapper, { marginTop: 12 }]}>
+            <Text style={[fonts.font16semibold, { color: GRAY }]}>
+              {"На номер "}
             </Text>
-            <Text style={[fonts.font16semibold, {color: BLACK}]}>
-              {`+7 ${formatPhoneNumber(user?.phone)}`}
+            <Text style={[fonts.font16semibold, { color: BLACK }]}>
+              {`+7 ${route?.params?.phone}`}
             </Text>
           </View>
-          <Text style={[fonts.font16semibold, {color: GRAY}]}>
-            {'отправлено СМС с кодом'}
+          <Text style={[fonts.font16semibold, { color: GRAY }]}>
+            {"отправлено СМС с кодом"}
           </Text>
         </View>
-        <View style={[wrappers.rowCenteredWrapper, {marginTop: -5}]}>
+        <View style={[wrappers.rowCenteredWrapper, { marginTop: -5 }]}>
           <OtpInputs
             numberOfInputs={4} // pass any number as per requirements
             focusedBorderColor={WHITE}
             unFocusedBorderColor={WHITE}
             clearTextOnFocus={true}
             //inputsContainer={{width: 200, marginHorizontal: 70}}
-            containerStyles={{marginLeft: 52}}
+            containerStyles={{ marginLeft: 52 }}
             //errorMessage={"Invalid OTP"} // pass error message if applicable
-            inputTextErrorColor={'black'}
-            errorMessageTextStyles={{color: 'red'}} // Error message text style
-            handleChange={code => {
+            inputTextErrorColor={"black"}
+            errorMessageTextStyles={{ color: "red" }} // Error message text style
+            handleChange={(code) => {
               changeCode(code);
             }}
-            keyboardType={'number-pad'}
+            keyboardType={"number-pad"}
             secureTextEntry={false}
             inputStyles={{
               ...fonts.font16semibold,
@@ -101,21 +106,21 @@ const EnterCodeScreen: React.FC<{
             }}
           />
         </View>
-        <View style={[wrappers.centeredWrapper, {marginTop: -5}]}>
-          <Text style={[fonts.font12semibold, {color: GRAY}]}>
-            {'Если код не придет, можно получить'}
+        <View style={[wrappers.centeredWrapper, { marginTop: -5 }]}>
+          <Text style={[fonts.font12semibold, { color: GRAY }]}>
+            {"Если код не придет, можно получить"}
           </Text>
-          <Text style={[fonts.font12semibold, {color: GRAY}]}>
+          <Text style={[fonts.font12semibold, { color: GRAY }]}>
             {`новый через ${getNumber(seconds)} сек`}
           </Text>
         </View>
         <ButtonRed
-          label={'Получить новый код'}
+          label={"Получить новый код"}
           disabled={seconds > 0}
-          style={{marginTop: 135}}
+          style={{ marginTop: 135 }}
           //onPress={() => navigation.navigate(ENTERNAME)}
           onPress={() =>
-            route?.params?.from !== 'phone'
+            route?.params?.from !== "phone"
               ? registration(() => {
                   seconds1 = 60;
                 })
@@ -126,7 +131,7 @@ const EnterCodeScreen: React.FC<{
         />
       </ScrollView>
     );
-  }),
+  })
 );
 
 const styles = StyleSheet.create({

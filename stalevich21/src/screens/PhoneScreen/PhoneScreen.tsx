@@ -21,6 +21,7 @@ const PhoneScreen: React.FC<{
 }> = inject('authStore')(
   observer(({navigation, authStore}) => {
     const {user, updateUser, auth} = authStore;
+    const [phone, setPhone] = React.useState(0);
 
     return (
       <KeyboardAwareScrollView
@@ -66,14 +67,20 @@ const PhoneScreen: React.FC<{
           defaultValue={''}
           keyboardType={'numeric'}
           inputPhone={true}
-          value={getStringValue(user.phone)}
-          onChange={value => updateUser(value, 'phone')}
+          value={phone}
+          maxLength={10}
+          onChange={value => { 
+            if(value.length <= 10){ 
+            setPhone(value);
+            }
+          }
+          }
         />
         <ButtonRed
           label={'Войти'}
           style={{marginTop: 16}}
           onPress={() =>
-            auth(() => navigation.navigate(ENTERCODE, {from: PHONE}))
+            auth(() => navigation.navigate(ENTERCODE, {from: PHONE, phone:phone}),phone)
           }
         />
         <TouchableOpacity onPress={() => navigation.navigate(REGISTRATION)}>

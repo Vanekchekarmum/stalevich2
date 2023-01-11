@@ -16,6 +16,10 @@
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_forkicon.png"
     },
     {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_deliveryblack.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_deliveryblack.png"
+    },
+    {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_images_orderonspot.png.flat",
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_images_orderonspot.png"
     },
@@ -24,12 +28,16 @@
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_minusicon.png"
     },
     {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_staricon.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_staricon.png"
+    },
+    {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_locationicon.png.flat",
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_locationicon.png"
     },
     {
-        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_staricon.png.flat",
-        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_staricon.png"
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_acceptgrey.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_acceptgrey.png"
     },
     {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_deletecircleicon.png.flat",
@@ -42,10 +50,6 @@
     {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_pointblackicons.png.flat",
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_pointblackicons.png"
-    },
-    {
-        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_uncheckicon.png.flat",
-        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_uncheckicon.png"
     },
     {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_images_girlwithbag.png.flat",
@@ -66,6 +70,10 @@
     {
         "merged": "com.yest.app-merged_res-38:/drawable-xxhdpi_node_modules_reactnavigation_elements_src_assets_backicon.png.flat",
         "source": "com.yest.app-react-33:/drawable-xxhdpi/node_modules_reactnavigation_elements_src_assets_backicon.png"
+    },
+    {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_cookedgrey.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_cookedgrey.png"
     },
     {
         "merged": "com.yest.app-merged_res-38:/mipmap-mdpi_ic_launcher.png.flat",
@@ -128,6 +136,10 @@
         "source": "com.yest.app-react-33:/drawable-mdpi/node_modules_reactnativedropdownpicker_src_themes_dark_icons_tick.png"
     },
     {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_menucard.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_menucard.png"
+    },
+    {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_images_orderdelivery.png.flat",
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_images_orderdelivery.png"
     },
@@ -148,8 +160,20 @@
         "source": "com.yest.app-main-39:/mipmap-xhdpi/ic_launcher.png"
     },
     {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_delivetygrey.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_delivetygrey.png"
+    },
+    {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_cancel.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_cancel.png"
+    },
+    {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_images_restarauntemptyimage.png.flat",
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_images_restarauntemptyimage.png"
+    },
+    {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_acceptgreen.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_acceptgreen.png"
     },
     {
         "merged": "com.yest.app-merged_res-38:/mipmap-xxxhdpi_ic_launcher.png.flat",
@@ -158,6 +182,10 @@
     {
         "merged": "com.yest.app-merged_res-38:/drawable_rn_edit_text_material.xml.flat",
         "source": "com.yest.app-main-39:/drawable/rn_edit_text_material.xml"
+    },
+    {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_cookedblack.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_cookedblack.png"
     },
     {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_node_modules_reactnavigation_elements_src_assets_backicon.png.flat",
@@ -184,12 +212,12 @@
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_hourglassicon.png"
     },
     {
-        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_images_spblogoimage.png.flat",
-        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_images_spblogoimage.png"
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_cookedyellow.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_cookedyellow.png"
     },
     {
-        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_checkicon.png.flat",
-        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_checkicon.png"
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_images_spblogoimage.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_images_spblogoimage.png"
     },
     {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_profileicon.png.flat",
@@ -220,8 +248,20 @@
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_trashicon.png"
     },
     {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_deliveryyellow.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_deliveryyellow.png"
+    },
+    {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_finishblack.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_finishblack.png"
+    },
+    {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_editicon.png.flat",
         "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_icons_editicon.png"
+    },
+    {
+        "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_statuses_finishgreen.png.flat",
+        "source": "com.yest.app-react-33:/drawable-mdpi/src_assets_statuses_finishgreen.png"
     },
     {
         "merged": "com.yest.app-merged_res-38:/drawable-mdpi_src_assets_icons_forkredicon.png.flat",

@@ -17,7 +17,7 @@ import StatusBar from "../../components/StatusBar";
 import ButtonBack from "../../components/ButtonBack";
 import InputWithLabel from "../../components/InputWithLabel";
 import ButtonRed from "../../components/ButtonRed";
-
+import { AsyncStorage } from "react-native";
 import { GRAY, LIGHT_GRAY, LIGHT_GRAY_2, WHITE } from "../../assets/colors";
 import { fonts } from "../../constants/styles";
 import { WINDOW_HEIGHT, WINDOW_WIDTH, wrappers } from "../../utils/style";
@@ -26,6 +26,7 @@ import {
   DELIVERY,
   ORDERPROCESSED,
   RESTAURANT,
+  SMS,
 } from "../../utils/navigation";
 import { inject, observer } from "mobx-react";
 import { showAlertError } from "../../utils/utils";
@@ -45,7 +46,7 @@ const DeliveryScreen: React.FC<{
 )(
   observer(({ navigation, authStore, dataStore, route }) => {
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [name, setName] = useState(null);
+    const [name, setName] = useState("");
     const [birthday, setBirthday] = useState(new Date());
     const [newUser, setNewUser] = useState(true);
     const [validUser, setValidUser] = useState(false);
@@ -89,8 +90,23 @@ const DeliveryScreen: React.FC<{
       getCountP,
       setCountP,
       getLol,
+      setOrderId,
       sbpPay,
     } = dataStore;
+    const { auth, changeKostilFalse, kostil } = authStore;
+
+    useEffect(() => {
+      const unsubscribe = navigation.addListener("focus", () => {
+        console.log("rout",kostil);
+        if (kostil) {
+          // console.log("route.params?.next", route.params?.next);
+          afterSms();
+
+        }
+      });
+
+      return unsubscribe;
+    }, [navigation]);
 
     const fetchStreets = () => {
       if (street?.length > 3) {
@@ -119,6 +135,19 @@ const DeliveryScreen: React.FC<{
         }, 500);
       }
     };
+    const getUserPhone = async () => {
+      let phone = await AsyncStorage.getItem("phone");
+      let name = await AsyncStorage.getItem("name");
+      if (phone) {
+        setPhoneNumber(phone);
+      }
+      if (name) {
+        setName(name);
+      }
+    };
+    useEffect(() => {
+      getUserPhone();
+    }, []);
 
     const checkUser = () => {
       if (name?.length > 2 && phoneNumber?.length > 3 && birthday != null) {
@@ -131,6 +160,7 @@ const DeliveryScreen: React.FC<{
         userCheck(phoneNumber, name, dateResult)
           .then((response) => {
             if (response.data.success) {
+              console.log("userCheck---==", response.data);
               setValidUser(true);
             } else {
               showAlertError("Введите действительные данные пользователя");
@@ -216,6 +246,7 @@ const DeliveryScreen: React.FC<{
       setLoader(true);
       periodTime(dateResult, order?.organizationId)
         .then((periodResponse) => {
+          console.log("periodResponse", periodResponse.data);
           if (periodResponse.data.success && periodResponse.data.data.length) {
             setPeriods(periodResponse.data.data);
           } else {
@@ -240,24 +271,6 @@ const DeliveryScreen: React.FC<{
       return dateResult;
     };
 
-    // const firstPeriod = () => {
-    //   periodTime(nowDate(), order?.organizationId)
-    //     .then((periodResponse) => {
-    //       if (periodResponse.data.success && periodResponse.data.data.length) {
-    //         console.log("lolpoap", periodResponse.data.data[0]?.periodId);
-    //         console.log("nowDjjjjate", nowDate());
-    //         console.log("date", date);
-    //         return periodResponse.data.data[0]?.periodId;
-    //       } else {
-    //         showAlertError(periodResponse.data.error);
-    //         console.log("first failed");
-    //       }
-    //     })
-    //     .catch((e) => {
-    //       console.log("periodResponse failed");
-    //     });
-    // };
-
     const placeOrderDateTime = () => {
       setLoader(true);
 
@@ -266,6 +279,7 @@ const DeliveryScreen: React.FC<{
         type === DELIVERY ? period : onPlace
       )
         .then((response) => {
+          console.log("placeOrderDateTime success", response.data);
           if (response.data.success) {
             placeOrder();
           } else {
@@ -277,12 +291,64 @@ const DeliveryScreen: React.FC<{
         .catch((e) => {
           console.log("failed placeOrderDateTime", e);
           setLoader(false);
-
         })
         .finally(() => {
           console.log("loader 1");
         });
     };
+
+    const afterSms = () => {
+      changeKostilFalse();
+
+      let arr = shop.branches.map((b) => b.id);
+      arr.unshift(shop.uuid);
+
+      let payload = {
+        organizations: arr,
+        paymentType: 1,
+        quantityOfPeople: getCountP() > 0 ? getCountP() + 1 : 0,
+        soonAsPossible: 1,
+        entrance,
+        floor,
+        appartment,
+        comment,
+      };
+      orderDone(payload)
+        .then((response) => {
+          console.log("-=-=-==- success", response.data);
+          setOrderId(response.data.data[0].orderId),
+            sbpPay(
+              response.data.data[0].orderId,
+              getLol(),
+              response.data.data[0].orderNumber,
+              response.data.data[0].payableSum
+            ).then((respo) => {
+              console.log("1111111", respo.data);
+
+              if (respo.data.success) {
+                Linking.openURL(respo.data.url);
+                setCountP(0);
+                removeCart();
+                navigation.popToTop();
+                navigation.navigate(ORDERPROCESSED, {
+                  from: DELIVERY,
+                });
+                setLoader(false);
+                console.log("lolkekeahah error");
+              }
+            });
+
+          setCountP(0);
+          removeCart();
+          navigation.popToTop();
+          navigation.navigate(ORDERPROCESSED, { from: DELIVERY });
+        })
+        .catch((error) => {
+          console.log("placeorder error");
+        })
+        .finally(() => {});
+    };
+
     const placeOrder = () => {
       let arr = shop.branches.map((b) => b.id);
       arr.unshift(shop.uuid);
@@ -302,37 +368,14 @@ const DeliveryScreen: React.FC<{
         .then((res) => {
           console.log("-=-=-==- orderAudit success", res.data.success);
           if (res.data.success) {
-            orderDone(payload)
-              .then((response) => {
-                console.log("-=-=-==- success", response.data);
-                sbpPay(
-                  response.data.data[0].orderId,
-                  getLol(),
-                  response.data.data[0].orderNumber,
-                  response.data.data[0].payableSum
-                ).then((respo) => {
-                  console.log("1111111", respo.data);
-
-                  if (respo.data.success) {
-                    Linking.openURL(respo.data.url);
-                    setCountP(0);
-                    removeCart();
-                    navigation.popToTop();
-                    navigation.navigate(ORDERPROCESSED, { from: DELIVERY });
-                    setLoader(false);
-                    console.log("lolkekeahah error");
-                  }
-                });
-
-                // setCountP(0);
-                // removeCart();
-                // navigation.popToTop();
-                // navigation.navigate(ORDERPROCESSED, { from: DELIVERY });
-              })
-              .catch((error) => {
-                console.log("placeorder error");
-              })
-              .finally(() => {});
+            auth(
+              () =>
+                navigation.navigate(SMS, {
+                  from: DELIVERY,
+                  phone: phoneNumber,
+                }),
+              phoneNumber
+            );
           } else {
             showAlertError(res.data.data[0].message);
             setLoader(false);
@@ -340,25 +383,6 @@ const DeliveryScreen: React.FC<{
         })
         .catch((error) => {
           console.log("-=-=-==- orderAudit failed", error);
-        });
-    };
-    const firstPeriod = () => {
-      // console.log("firstPeriod");
-      // console.log("seychas", nowDate());
-      // console.log("order?.organizationId", order?.organizationId);
-
-      periodTime(nowDate(), "a7898941-95f4-11eb-850a-0050569dbef0")
-        .then((periodResponse) => {
-          if (periodResponse.data.success && periodResponse.data.data.length) {
-            console.log("lolpoap", periodResponse.data.data[0]?.periodId);
-            return periodResponse.data.data[0]?.periodId;
-          } else {
-            showAlertError(periodResponse.data.error);
-            console.log("first failed");
-          }
-        })
-        .catch((e) => {
-          console.log("periodResponse failed");
         });
     };
 
@@ -500,6 +524,7 @@ const DeliveryScreen: React.FC<{
                       //alignItems: 'flex-start',
                       justifyContent: "flex-start",
                     }}
+                    zIndex={1000}
                     maxHeight={400}
                     flatListProps={{
                       initialNumToRender: 10,
@@ -623,7 +648,6 @@ const DeliveryScreen: React.FC<{
                       style={{
                         width: "100%",
                         height: 48,
-                        backgroundColor: LIGHT_GRAY_2,
                         borderRadius: 10,
                         borderWidth: 0,
                         paddingHorizontal: 17,
@@ -644,6 +668,7 @@ const DeliveryScreen: React.FC<{
                       open={datePickerOpen}
                       loading={dateLoading}
                       setOpen={setDatePickerOpen}
+                      zIndex={1000}
                       ListEmptyComponent={({
                         listMessageContainerStyle,
                         listMessageTextStyle,

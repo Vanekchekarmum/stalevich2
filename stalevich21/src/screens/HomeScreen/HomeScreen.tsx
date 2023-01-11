@@ -1,4 +1,4 @@
-import Reac,{useCallback} from 'react';
+import React,{useCallback} from 'react';
 import {
   Image,
   ScrollView,
@@ -20,6 +20,8 @@ import {getBottomSpace} from 'react-native-iphone-x-helper';
 import {IAuthStore} from '../../stores/AuthStore';
 import {IDataStore} from '../../stores/DataStore';
 import {inject, observer} from 'mobx-react';
+import AuthStore from '../../stores/AuthStore';
+import DataStore from '../../stores/DataStore';
 
 const HomeScreen: React.FC<{
   navigation: any;
@@ -31,11 +33,35 @@ const HomeScreen: React.FC<{
   'dataStore',
 )(
   observer(({navigation, route, authStore, dataStore}) => {
+    const [name, setName] = React.useState('');
+    const {getName, sesia, setSesiad,getSesssionId, user} = AuthStore;
+    const {session, generateSession,} = DataStore;
+    
     const {setType} = dataStore;
-    // const openSberOnline = useCallback(async () => {
-    //  Linking.openURL('sberbankonline://')
-    // }, []);
-  
+
+    // React.useEffect(() => {
+    //   console.log(getName().then(value => setName(value)));
+    // }, [getName, setName, names]);
+
+    // detect if user is on this screen
+    React.useEffect(() => {
+      const unsubscribe = navigation.addListener('focus', () => {
+        console.log(getName().then(value => setName(value)));
+        console.log('HomeScreen focusedggggddd', user);
+        console.log('HomeScreen focused', session.sessionId);
+      });
+      getSesssionId()
+      if (!session.sessionId) {
+        generateSession()
+        getSesssionId()
+        console.log('session generated',user);
+      }
+      setSesiad(session.sessionId)
+
+
+      return unsubscribe;
+    }, [navigation]);
+    
 
 
 
@@ -49,7 +75,8 @@ const HomeScreen: React.FC<{
             height: WINDOW_HEIGHT - 90 - getBottomSpace(),
           }}>
 
-          <Text style={styles.helloFont}>{'Привет, Джон!'}</Text>
+          {name ? <Text style={styles.helloFont}>{`Привет, ${name}!`}</Text>
+          : <Text style={styles.helloFont}>{`Привет!`}</Text>}
           <Text style={styles.descriptionFont}>
             {'Сегодня отличный день,\n чтобы немного покушать :)'}
           </Text>

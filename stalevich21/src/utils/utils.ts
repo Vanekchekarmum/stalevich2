@@ -2,8 +2,8 @@ import {useEffect, useState} from 'react';
 import {duration} from 'moment';
 import {Alert} from 'react-native';
 
-export const urlProducts = 'http://marketa.su/uploads/images/products/';
-export const urlShops = 'http://marketa.su/uploads/images/events/';
+export const urlProducts = 'https://marketa.su/uploads/images/products/';
+export const urlShops = 'https://marketa.su/uploads/images/events/';
 
 export const getDuration = (number1 = 60) => {
   const [number, setNumber] = useState(duration(0, 'milliseconds'));

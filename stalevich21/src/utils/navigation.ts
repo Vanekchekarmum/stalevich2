@@ -17,3 +17,5 @@ export const BOOKINGMADE = 'bookingmade';
 export const BOOKINGHISTORY = 'bookinghistory';
 export const REGISTRATION = 'registration';
 export const SELECTCITY = 'selectcity';
+export const MYORDERS = 'myorders';
+export const SMS = 'sms';

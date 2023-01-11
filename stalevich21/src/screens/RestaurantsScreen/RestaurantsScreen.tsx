@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Image,
   RefreshControl,
@@ -8,17 +8,18 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import {getBottomSpace} from 'react-native-iphone-x-helper';
-import {inject, observer} from 'mobx-react';
+} from "react-native";
+import { getBottomSpace } from "react-native-iphone-x-helper";
+import { inject, observer } from "mobx-react";
+import { AsyncStorage } from "react-native";
+import InputSearch from "../../components/InputSearch";
+import HorizontalTabMenu from "../../components/HorizontalTabMenu";
+import RestaurantTab from "./components/RestaurantTab";
+import SearchResult from "./components/SearchResult";
+import ButtonBack from "../../components/ButtonBack";
+import AuthStore from '../../stores/AuthStore';
 
-import InputSearch from '../../components/InputSearch';
-import HorizontalTabMenu from '../../components/HorizontalTabMenu';
-import RestaurantTab from './components/RestaurantTab';
-import SearchResult from './components/SearchResult';
-import ButtonBack from '../../components/ButtonBack';
-
-import {GRAY, LIGHT_GRAY} from '../../assets/colors';
+import { GRAY, LIGHT_GRAY } from "../../assets/colors";
 import {
   icon20,
   icon24,
@@ -26,17 +27,17 @@ import {
   WINDOW_HEIGHT,
   WINDOW_WIDTH,
   wrappers,
-} from '../../utils/style';
-import {fonts} from '../../constants/styles';
+} from "../../utils/style";
+import { fonts } from "../../constants/styles";
 import {
   DELIVERY,
   RESTAURANT,
   RESTAURANTS,
   SELECTCITY,
-} from '../../utils/navigation';
-import {IAuthStore} from '../../stores/AuthStore';
-import {IDataStore} from '../../stores/DataStore';
-import {Shop} from '../../api/types';
+} from "../../utils/navigation";
+import { IAuthStore } from "../../stores/AuthStore";
+import { IDataStore } from "../../stores/DataStore";
+import { Shop } from "../../api/types";
 
 const RestaurantsScreen: React.FC<{
   navigation: any;
@@ -44,12 +45,12 @@ const RestaurantsScreen: React.FC<{
   authStore: IAuthStore;
   dataStore: IDataStore;
 }> = inject(
-  'authStore',
-  'dataStore',
+  "authStore",
+  "dataStore"
 )(
-  observer(({navigation, route, authStore, dataStore}) => {
-    let [showResult, setShowResult] = useState('Все');
-    let [searchValue, setSearchValue] = useState('');
+  observer(({ navigation, route, authStore, dataStore }) => {
+    let [showResult, setShowResult] = useState("Все");
+    let [searchValue, setSearchValue] = useState("");
     let [searchFocus, setSearchFocus] = useState(false);
 
     const {
@@ -67,6 +68,8 @@ const RestaurantsScreen: React.FC<{
       onSortedShops,
     } = dataStore;
 
+    const { setUserName } = AuthStore;
+
     const reloadData = () => {
       getListShop(searchValue);
     };
@@ -76,7 +79,7 @@ const RestaurantsScreen: React.FC<{
     }, [searchValue]);
 
     useEffect(() => {
-      console.log('route?.params?.from', type);
+      console.log("route?.params?.from", type);
     }, [type]);
 
     useEffect(() => {
@@ -101,6 +104,12 @@ const RestaurantsScreen: React.FC<{
       onSortedShops(type);
     };
 
+ 
+
+    const removeAll = async () => {
+      await AsyncStorage.clear();
+    };
+
     return (
       <View>
         <StatusBar />
@@ -109,15 +118,17 @@ const RestaurantsScreen: React.FC<{
             <View
               style={[
                 wrappers.rowStretchedHorizontalWrapper,
-                {marginTop: 44 + 9},
-              ]}>
+                { marginTop: 44 + 9 },
+              ]}
+            >
               <TouchableOpacity
                 style={[wrappers.rowAlignedWrapper]}
                 onPress={() =>
-                  navigation.navigate(SELECTCITY, {from: RESTAURANTS})
-                }>
+                  navigation.navigate(SELECTCITY, { from: RESTAURANTS })
+                }
+              >
                 <Image
-                  source={require('../../assets/icons/location-icon.png')}
+                  source={require("../../assets/icons/location-icon.png")}
                   style={icon24}
                 />
                 <Text style={styles.fontCity}>{currentCity?.name}</Text>
@@ -125,7 +136,7 @@ const RestaurantsScreen: React.FC<{
               {route?.params?.from === DELIVERY && (
                 <TouchableOpacity>
                   <Image
-                    source={require('../../assets/icons/heart-icon.png')}
+                    source={require("../../assets/icons/heart-icon.png")}
                     style={icon20}
                   />
                 </TouchableOpacity>
@@ -135,11 +146,12 @@ const RestaurantsScreen: React.FC<{
           <View
             style={[
               wrappers.rowCenteredWrapper,
-              {marginTop: searchFocus ? 44 : 19},
-            ]}>
+              { marginTop: searchFocus ? 44 : 19 },
+            ]}
+          >
             {searchFocus && (
               <ButtonBack
-                style={{marginRight: 8}}
+                style={{ marginRight: 8 }}
                 onPress={() => setSearchFocus(false)}
               />
             )}
@@ -151,15 +163,16 @@ const RestaurantsScreen: React.FC<{
               onFocus={() => setSearchFocus(true)}
               onChange={value => setSearchValue(value)}
             />
+
           </View>
-          {!searchFocus && searchValue === '' && (
+          {/* {!searchFocus && searchValue === "" && (
             <HorizontalTabMenu
-              style={{marginTop: 24}}
+              style={{ marginTop: 24 }}
               onChange={onSortShops}
-              defaultValue={'all'}
+              defaultValue={"all"}
               items={itemsSortShopsDefault}
             />
-          )}
+          )} */}
           <ScrollView
             showsVerticalScrollIndicator={false}
             // contentContainerStyle={{flexGrow:1, marginTop:8}}
@@ -176,19 +189,20 @@ const RestaurantsScreen: React.FC<{
                 refreshing={loading}
                 onRefresh={() => reloadData()}
               />
-            }>
-            {searchValue === '1' && (
-              <Text style={styles.emptySearch}>{'Увы, ничего не найдено'}</Text>
+            }
+          >
+            {searchValue === "1" && (
+              <Text style={styles.emptySearch}>{"Увы, ничего не найдено"}</Text>
             )}
-            {searchValue === '2' && <SearchResult />}
-            {searchValue === '3' && (
+            {searchValue === "2" && <SearchResult />}
+            {searchValue === "3" && (
               <>
                 <SearchResult withProducts={true} />
                 <SearchResult withProducts={true} />
                 <SearchResult withProducts={true} />
               </>
             )}
-            <View style={{height: 16}} />
+            <View style={{ height: 16 }} />
             {sortedShops.length ? (
               sortedShops.map((item: Shop) => (
                 <RestaurantTab
@@ -197,9 +211,9 @@ const RestaurantsScreen: React.FC<{
                 />
               ))
             ) : (
-              <Text style={styles.emptySearch}>{'Увы, ничего не найдено'}</Text>
+              <Text style={styles.emptySearch}>{"Увы, ничего не найдено"}</Text>
             )}
-            {!searchFocus && searchValue === '' && (
+            {!searchFocus && searchValue === "" && (
               <>
                 {/*<RestaurantTab*/}
                 {/*  onPress={() => navigation.navigate(BOOKTABLE)}*/}
@@ -216,19 +230,19 @@ const RestaurantsScreen: React.FC<{
             {/*  return <RestaurantTab onPress={() => navigation.navigate(RESTAURANT)} type={i} />})*/}
             {/*}*/}
 
-            <View style={{height: 100}} />
+            <View style={{ height: 100 }} />
           </ScrollView>
         </View>
       </View>
     );
-  }),
+  })
 );
 
 const styles = StyleSheet.create({
   emptySearch: {
     ...fonts.font16bold,
     color: GRAY,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 48,
   },
   fontCity: {

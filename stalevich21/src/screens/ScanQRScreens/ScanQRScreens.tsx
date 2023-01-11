@@ -1,3 +1,4 @@
+
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {
@@ -22,6 +23,21 @@ const ScanQrScreens: React.FC<{
   'dataStore',
 )(
   observer(({navigation, route, authStore, dataStore}) => {
+    const fakeUrl = 'https://entrega.su/?organizationId=a7898941-95f4-11eb-850a-0050569dbef0&branchId=514236af-95f5-11eb-850a-0050569dbef0&tableId=9c544bde-6265-4d67-9ef4-52deb9ff332f&streetId=7800000000014670000000000&houseNumber=172%20%D0%BB%D0%B8%D1%82%20%D0%9C'
+    // get,organizationId, branchId, tableId, streetId, houseNumber from url
+    const getParamsFromUrl = (url) => {
+      const params = url.split('?')[1].split('&');
+      const organizationId = params[0].split('=')[1];
+      const branchId = params[1].split('=')[1];
+      const tableId = params[2].split('=')[1];
+      const streetId = params[3].split('=')[1];
+      const houseNumber = params[4].split('=')[1];
+      return {organizationId, branchId, tableId, streetId, houseNumber};
+    };
+    // console.log('branchId, tableId, streetId, houseNumber', branchId, tableId, streetId, houseNumber);
+
+
+
     const camera = useRef<Camera>(null);
     const [loader, setLoader] = useState(true);
     const devices = useCameraDevices();
@@ -49,14 +65,15 @@ const ScanQrScreens: React.FC<{
 
     const processResult = useCallback(
       value => {
-        const res= JSON.parse(value.rawValue)
+        const res= value.rawValue
         console.log('-----', res);
-        setHouseNumber(res.houseNumber);
-        setStreetId(res.streetId)
-        setTable(res.tableId);
-        setOrganizationId(res.organizationId);
-        getShop(res.organizationId);
-        getListProducts(res.organizationId);
+        const {organizationId,branchId, tableId, streetId, houseNumber} = getParamsFromUrl(res);
+        setHouseNumber(houseNumber);
+        setStreetId(streetId)
+        setTable(tableId);
+        setOrganizationId(organizationId);
+        getShop(organizationId);
+        getListProducts(organizationId);
         setTimeout(() => {
           navigation.navigate(RESTAURANT);
           setLoader(false);
